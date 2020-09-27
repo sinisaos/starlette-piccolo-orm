@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero hero-bg d-flex justify-content-center align-items-center">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-6 col-md-10 col-12 d-flex flex-column justify-content-center align-items-center">
+        <div class="hero-text">
+          <h1>Quickly ask questions, find answers and share
+            knowledge</h1>
+          <a href="" class="btn btn-outline-info">Ask question</a>
+        </div>
+      </div>
+      <div class="col-lg-6 col-12">
+        <div class="hero-image">
+          <img src="{{ url_for('static', path='images/working-girl.png') }}" class="img-fluid" alt="working girl">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

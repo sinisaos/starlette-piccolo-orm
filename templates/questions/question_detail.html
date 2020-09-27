@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block content %}
+<main role="main">
+    <br><br>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <div class="card">
+                    <div class="card-body">
+                        <h4><b>{{ item["title"] }}</b>
+                            <a class="btn btn-outline-dark float-right"
+                                href="{{ url_for('questions_categories', category=item['category.slug']) }}">{{ item["category.name"] }}</a>
+                        </h4>
+                        <span>asked on <i>{{ item["created_at"].strftime('%d-%m-%Y %H:%M:%S') }}</i> by
+                            <b>{{ item["user.username"] }}</b><b>
+                            </b>
+                        </span>
+                        <hr>
+                        <p class="card-title">{{ item["description"] }}</p>
+                        <p class="float-left">
+                            <i class="fa fa-eye" aria-hidden="true" title="Views">
+                                {{ item.view }}</i>&ensp;
+                            <i class="fa fa-comment" aria-hidden="true" title="Answers"> {{ answers_count }} </i>&ensp;
+                            <i class="fa fa-thumbs-up" aria-hidden="true" title="Likes">
+                                {{ item.question_like }}</i>&ensp;
+                        </p>
+                        {% if request.user.is_authenticated %}
+                        <form id="questionlikesForm" class="form form-questionlikes" method="POST" action=""
+                            role="form">
+                            {{ question_likes_form.question_id(value=item["id"]) }}
+                            <p class="float-right"><input class="btn btn-link fa" style="color:#33cc33;" type="submit"
+                                    value="&#xf164; {{ item.question_like }}">
+                            </p>
+                        </form>
+                        <br>
+                        {% else %}
+                        <a href="{{ url_for('login') }}?next={{ path }}" class="float-right" style="color:#33cc33;"><i
+                                class="fa fa-thumbs-up" aria-hidden="true">
+                                {{ item["question_like"] }}&ensp;</i></a>
+                        {% endif %}
+                    </div>
+                </div>
+                <br>
+                <h3 class="float-left">{{ answers_count }} answer(s)</h3>
+                {% if request.user.is_authenticated %}
+                <a href="{{ url_for('answer_create') }}?next={{ path }}" class="btn btn-outline-info float-right">Post
+                    answer</a>
+                <br><br>
+                {% else %}
+                <a href="{{ url_for('login') }}?next={{ path }}" class="btn btn-outline-info float-right">Post
+                    answer</a>
+                <br><br>
+                {% endif %}
+                {% for result in answers %}
+                <div class="card">
+                    <div class="card-body">
+                        <h4><small class="float-left">Answered on
+                                <i>{{ result.created_at.strftime('%d-%m-%Y %H:%M:%S') }}</i>
+                                by
+                                <b>{{ result["ans_user.username"] }}</b><b>
+                                </b></small></h4>
+                        <br><br>
+                        <p>{{ result.content }}</p>
+                        {% if request.user.is_authenticated %}
+                        <form id="likesForm" class="form form-likes" method="POST" action="" role="form">
+                            {{ likes_form.answer_id(value=result.id) }}
+                            <p class="float-right"><input class="btn btn-link fa" style="color:#33cc33;" type="submit"
+                                    value="&#xf164; {{ result.answer_like }}">&nbsp;
+                            </p>
+                        </form>
+                        {% else %}
+                        <a href="{{ url_for('login') }}?next={{ path }}" class="float-right" style="color:#33cc33;"><i
+                                class="fa fa-thumbs-up" aria-hidden="true" title="Like">
+                                {{ result.answer_like }}&ensp;</i></a>
+                        {% endif %}
+                        {% if item["user.username"] == request.user.username and result.is_accepted_answer == False and item["accepted_answer"] == False  %}
+                        <a href="{{ url_for('accepted_answer') }}?next={{ path }}/{{ result.id }}"
+                            class="btn btn-outline-info float-left">Accept
+                            Answer</a>
+                        <br>
+                        {% elif item["user.username"] == request.user.username and result.is_accepted_answer == True %}
+                        <span class="badge badge-badge-pill badge-success float-left">Accepted answer</span>
+                        {% elif result.is_accepted_answer == True %}
+                        <span class="badge badge-badge-pill badge-success float-left">Accepted answer</span>
+                        {% else %}
+                        {% endif %}
+                        <br>
+                        <hr>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

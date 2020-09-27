@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<main role="main">
+    <div class="container">
+        <br>
+        <form id="acceptForm" class="form form-accept" method="POST" action="" role="form">
+            {{ form.answer_id(value=answer_id) }}
+            <p class="float-left"><input class="btn btn-outline-info" type="submit" value="Accept Answer">
+            </p>
+        </form>
+        </form>
+        <br><br>
+    </div> <!-- /container -->
+</main>
+{% endblock %}

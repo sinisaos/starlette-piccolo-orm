@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block content %}
+<main role="main">
+    <br><br>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                {% include 'questions/search_form.html' %}
+                <a id="button" class="btn btn-outline-success float-left" href=""><i class="fa fa-plus"
+                        aria-hidden="true"></i> Ask
+                    Questions</a>
+                <br><br><br>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-outline-info dropdown-toggle" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                        Filter questions
+                    </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item"
+                            href="{{ url_for('questions_search') }}?{% if q or q == '' %}q={{ q }}&tab=oldest{% else %}tab=oldest{% endif %}">Oldest</a>
+                        <a class="dropdown-item"
+                            href="{{ url_for('questions_search') }}?{% if q or q == '' %}q={{ q }}&tab=unsolved{% else %}tab=unsolved{% endif %}">Unsolved</a>
+                        <a class="dropdown-item"
+                            href="{{ url_for('questions_search') }}?{% if q or q == '' %}q={{ q }}&tab=solved{% else %}tab=solved{% endif %}">Solved</a>
+                    </div>
+                </div>
+                <br><br>
+            </div>
+
+            <div class="col-lg-9">
+                {% for item in results %}
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title"><b><a
+                                    href="{{ url_for('question_detail', id=item[0].id, slug=item[0].slug) }}">{{ item[0].title }}</a></b>
+                            <a class="btn btn-outline-dark float-right"
+                                href="{{ url_for('questions_categories', category=item[0]['category.slug']) }}">{{ item[0]["category.name"] }}</a>
+                        </h4>
+                        <span>asked on <i>{{ item[0].created_at.strftime('%d-%m-%Y %H:%M:%S') }}</i>
+                            by
+                            <b>{{ item[0]["user.username"] }}</b>
+                        </span>
+                        <hr>
+                        <p class="card-title">{{ item[0].description }}</p><br>
+                        <i class="fa fa-eye" aria-hidden="true" title="Views"> {{ item[0].view }}</i>&ensp;
+                        <i class="fa fa-comment" aria-hidden="true" title="Answers"> {{ item[1][0]["count"] }}</i>&ensp;
+                        <i class="fa fa-thumbs-up" aria-hidden="true" title="Likes">
+                            {{ item[0].question_like }}</i>&ensp;
+                        {% if item[0].accepted_answer %}
+                        <span class="badge badge-badge-pill-lg badge-success float-right">Solved</span>
+                        {% endif %}
+                        <br>
+                    </div>
+                </div>
+                <br>
+                {% else %}
+                <h4 class="card-title">No questions</h4>
+                <br>
+                {% endfor %}
+                {% include 'questions/pagination.html' %}
+            </div>
+            <div class="col-lg-3 border-left">
+                <h3 class="mu-sidebar-widget-title">Categories</h3>
+                {% for category in categories %}
+                <p><a href="{{ url_for('questions_categories', category=category[0].slug) }}">{{ category[0].name }}</a>
+                    ({{ category[1] }})
+                </p>
+                {% endfor %}
+            </div>
+        </div>
+    </div> <!-- /container -->
+</main>
+{% endblock %}
