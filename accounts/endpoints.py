@@ -200,6 +200,27 @@ async def profile_answers(request):
         )
 
 
+@requires("authenticated")
+async def user_delete(request):
+    """
+    Delete user
+    """
+    u = User
+    request_path_id = request.path_params["id"]
+    if request.method == "POST":
+        await u.raw(
+            f"UPDATE question SET accepted_answer = false "
+            f"FROM answer, piccolo_user WHERE question.id = answer.question "
+            f"AND piccolo_user.id = {request_path_id} AND "
+            f"question.accepted_answer = true;"
+        ).run()
+        await u.delete().where(u.id == request_path_id).run()
+        request.session.clear()
+        response = RedirectResponse("/", status_code=302)
+        response.delete_cookie("jwt")
+        return response
+
+
 async def logout(request):
     """
     Logout user

@@ -4,6 +4,7 @@ from accounts.endpoints import (
     login,
     logout,
     register,
+    user_delete,
     profile,
     profile_questions,
     profile_answers,
@@ -20,6 +21,12 @@ accounts_routes = Router(
         ),
         Route(
             "/logout", endpoint=logout, methods=["GET", "POST"], name="logout"
+        ),
+        Route(
+            "/user-delete/{id:int}",
+            endpoint=user_delete,
+            methods=["GET", "POST"],
+            name="user_delete",
         ),
         Route("/profile", endpoint=profile, methods=["GET"], name="profile"),
         Route(
