@@ -1,16 +1,17 @@
-from wtforms import Form, HiddenField, StringField, TextAreaField
+from wtforms import Form, HiddenField, StringField, TextAreaField, SelectField
 from wtforms.validators import InputRequired
 
 
 class QuestionForm(Form):
+    category = SelectField("Category", choices=[], coerce=int)
     title = StringField("Title", validators=[InputRequired()])
-    content = TextAreaField("Content", validators=[InputRequired()])
-    tags = StringField("Tags", validators=[InputRequired()])
+    description = TextAreaField("Content", validators=[InputRequired()])
 
 
 class QuestionEditForm(Form):
+    category = SelectField("Category", choices=[], coerce=int)
     title = StringField(validators=[InputRequired()])
-    content = TextAreaField(validators=[InputRequired()])
+    description = TextAreaField(validators=[InputRequired()])
 
 
 class AnswerForm(Form):

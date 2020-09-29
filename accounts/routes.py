@@ -1,6 +1,13 @@
 from starlette.routing import Route, Router
 
-from accounts.endpoints import login, logout, register
+from accounts.endpoints import (
+    login,
+    logout,
+    register,
+    profile,
+    profile_questions,
+    profile_answers,
+)
 
 accounts_routes = Router(
     [
@@ -13,6 +20,19 @@ accounts_routes = Router(
         ),
         Route(
             "/logout", endpoint=logout, methods=["GET", "POST"], name="logout"
+        ),
+        Route("/profile", endpoint=profile, methods=["GET"], name="profile"),
+        Route(
+            "/profile/questions",
+            endpoint=profile_questions,
+            methods=["GET"],
+            name="profile_questions",
+        ),
+        Route(
+            "/profile/answers",
+            endpoint=profile_answers,
+            methods=["GET"],
+            name="profile_answers",
         ),
     ]
 )

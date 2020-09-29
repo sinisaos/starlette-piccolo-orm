@@ -4,13 +4,29 @@ from starlette.authentication import requires
 from starlette.responses import RedirectResponse
 
 from accounts.tables import User
-from questions.forms import (AcceptedAnswerForm, AnswerForm, AnswerLikesForm,
-                             QuestionLikesForm)
-from questions.helpers import (count_search_questions, get_answers,
-                               get_questions, get_search_questions)
+from questions.forms import (
+    AcceptedAnswerForm,
+    AnswerForm,
+    AnswerEditForm,
+    AnswerLikesForm,
+    QuestionLikesForm,
+    QuestionEditForm,
+    QuestionForm,
+)
+from questions.helpers import (
+    count_search_questions,
+    get_answers,
+    get_questions,
+    get_search_questions,
+)
 from questions.tables import Answer, Category, Question
 from settings import BASE_HOST, templates
 from utils import pagination
+
+
+def get_categories():
+    category_list = Category.select().run_sync()
+    return category_list
 
 
 async def questions_list(request):
@@ -357,6 +373,94 @@ async def question_detail(request):
 
 
 @requires("authenticated")
+async def question_create(request):
+    """
+    Question form
+    """
+    u = User
+    c = Category
+    session_user = (
+        await u.select(u.id, u.username)
+        .where(u.username == request.user.username)
+        .first()
+        .run()
+    )
+    data = await request.form()
+    form = QuestionForm(data)
+    form.category.choices = [
+        (item["id"], item["name"]) for item in await c.select().run()
+    ]
+    title = form.title.data
+    if request.method == "POST" and form.validate():
+        query = Question(
+            title=title,
+            slug="-".join(title.lower().split()),
+            description=form.description.data,
+            created_at=datetime.datetime.now(),
+            category=form.category.data,
+            user=session_user["id"],
+        )
+        await query.save().run()
+        return RedirectResponse(url="/questions", status_code=302)
+    return templates.TemplateResponse(
+        "questions/question_create.html", {"request": request, "form": form}
+    )
+
+
+@requires("authenticated")
+async def question_edit(request):
+    """
+    Question edit form
+    """
+    p = Question
+    c = Category
+    request_path_id = request.path_params["id"]
+    question = (
+        await get_questions().where(p.id == request_path_id).first().run()
+    )
+    data = await request.form()
+    form = QuestionEditForm(obj=question, formdata=data)
+    new_form_value, form.description.data = (
+        form.description.data,
+        question["description"],
+    )
+    form.category.choices = [
+        (item["id"], item["name"]) for item in await c.select().run()
+    ]
+    title = form.title.data
+    if request.method == "POST" and form.validate():
+        await p.update(
+            {
+                p.title: title,
+                p.slug: "-".join(title.lower().split()),
+                p.description: new_form_value,
+                p.category: form.category.data,
+            }
+        ).where(p.id == request_path_id).run()
+        return RedirectResponse(url="/accounts/profile", status_code=302)
+    return templates.TemplateResponse(
+        "questions/question_edit.html",
+        {
+            "request": request,
+            "form": form,
+            "question": question,
+        },
+    )
+
+
+@requires("authenticated")
+async def question_delete(request):
+    """
+    Delete question
+    """
+    p = Question
+    request_path_id = request.path_params["id"]
+    if request.method == "POST":
+        await p.delete().where(p.id == request_path_id).run()
+        return RedirectResponse(url="/accounts/profile", status_code=302)
+
+
+@requires("authenticated")
 async def answer_create(request):
     """
     Answer form
@@ -365,13 +469,6 @@ async def answer_create(request):
     request_query_next = request.query_params["next"]
     data = await request.form()
     form = AnswerForm(data)
-    a = Answer
-    result = (
-        await get_answers()
-        .where(a.question.id == request_path_id)
-        .first()
-        .run()
-    )
     u = User
     session_user = (
         await u.select(u.id, u.username)
@@ -385,7 +482,7 @@ async def answer_create(request):
             created_at=datetime.datetime.now(),
             answer_like=0,
             is_accepted_answer=0,
-            question=result["question"],
+            question=request_path_id,
             ans_user=session_user["id"],
         )
         await query.save().run()
@@ -396,6 +493,46 @@ async def answer_create(request):
         "questions/answer_create.html",
         {"request": request, "form": form, "next": request_query_next},
     )
+
+
+@requires("authenticated")
+async def answer_edit(request):
+    """
+    Answer edit form
+    """
+    request_path_id = int(request.path_params["id"])
+    a = Answer
+    answer = await get_answers().where(a.id == request_path_id).first().run()
+    data = await request.form()
+    form = AnswerEditForm(data)
+    new_form_value, form.content.data = form.content.data, answer["content"]
+    if request.method == "POST" and form.validate():
+        await a.update({a.content: new_form_value}).where(
+            a.id == request_path_id
+        ).run()
+        return RedirectResponse("/accounts/profile", status_code=302)
+    return templates.TemplateResponse(
+        "questions/answer_edit.html",
+        {"request": request, "form": form, "answer": answer},
+    )
+
+
+@requires("authenticated")
+async def answer_delete(request):
+    """
+    Delete answer
+    """
+    p = Question
+    a = Answer
+    request_path_id = int(request.path_params["id"])
+    answer = list(await a.select().where(a.id == request_path_id).run())[0]
+    if request.method == "POST":
+        if answer["is_accepted_answer"] == True:
+            await p.update({p.accepted_answer: False}).where(
+                p.id == answer["question"]
+            ).run()
+        await a.delete().where(a.id == request_path_id).run()
+        return RedirectResponse("/accounts/profile", status_code=302)
 
 
 async def accepted_answer(request):

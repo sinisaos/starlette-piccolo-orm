@@ -1,8 +1,12 @@
 from starlette.responses import RedirectResponse
+from starlette.authentication import requires
 
 from accounts.forms import LoginForm, RegistrationForm
 from accounts.tables import User, generate_jwt
+from questions.tables import Question, Answer
+from questions.helpers import get_questions, get_answers
 from settings import BASE_HOST, templates
+from utils import pagination
 
 
 async def register(request):
@@ -108,6 +112,92 @@ async def login(request):
     return templates.TemplateResponse(
         "accounts/login.html", {"request": request, "form": form}
     )
+
+
+@requires("authenticated", redirect="index")
+async def profile(request):
+    if request.user.is_authenticated:
+        a = Answer
+        p = Question
+        u = User
+        auth_user = request.user.display_name
+        results = await u.select().where(u.username == auth_user).run()
+        questions_count = (
+            await p.count().where(p.user.username == auth_user).run()
+        )
+        answers_count = (
+            await a.count().where(a.ans_user.username == auth_user).run()
+        )
+        return templates.TemplateResponse(
+            "accounts/profile.html",
+            {
+                "request": request,
+                "results": results,
+                "auth_user": auth_user,
+                "questions_count": questions_count,
+                "answers_count": answers_count,
+            },
+        )
+
+
+@requires("authenticated", redirect="index")
+async def profile_questions(request):
+    p = Question
+    auth_user = request.user.display_name
+    page_query = pagination.get_page_number(url=request.url)
+    count = await p.count().where(p.user.username == auth_user).run()
+    paginator = pagination.Pagination(page_query, count)
+    if request.user.is_authenticated:
+        questions = (
+            await get_questions()
+            .where(p.user.username == auth_user)
+            .limit(paginator.page_size)
+            .offset(paginator.offset())
+            .run()
+        )
+        page_controls = pagination.get_page_controls(
+            url=request.url,
+            current_page=paginator.current_page(),
+            total_pages=paginator.total_pages(),
+        )
+        return templates.TemplateResponse(
+            "accounts/profile_questions.html",
+            {
+                "request": request,
+                "questions": questions,
+                "page_controls": page_controls,
+            },
+        )
+
+
+@requires("authenticated", redirect="index")
+async def profile_answers(request):
+    a = Answer
+    auth_user = request.user.display_name
+    page_query = pagination.get_page_number(url=request.url)
+    count = await a.count().where(a.ans_user.username == auth_user).run()
+    paginator = pagination.Pagination(page_query, count)
+    if request.user.is_authenticated:
+        answers = (
+            await get_answers()
+            .where(a.ans_user.username == auth_user)
+            .limit(paginator.page_size)
+            .offset(paginator.offset())
+            .run()
+        )
+        page_controls = pagination.get_page_controls(
+            url=request.url,
+            current_page=paginator.current_page(),
+            total_pages=paginator.total_pages(),
+        )
+        return templates.TemplateResponse(
+            "accounts/profile_answers.html",
+            {
+                "request": request,
+                "answers": answers,
+                "page_controls": page_controls,
+            },
+        )
 
 
 async def logout(request):

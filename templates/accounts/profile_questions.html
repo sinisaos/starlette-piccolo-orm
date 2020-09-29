@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<br>
+<div class="container">
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Content</th>
+                    <th>Created</th>
+                    <th>Views</th>
+                    <th>Likes</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in questions %}
+                <tr>
+                    <td>{{ item.title }}</td>
+                    <td>
+                        <p>{{ item.description[:50] }}...</p>
+                    </td>
+                    <td>{{ item.created_at.strftime('%d-%m-%Y %H:%M:%S') }}</td>
+                    <td>{{ item.view }}</td>
+                    <td>{{ item.question_like }}</td>
+                    <td>
+                        <form action="/questions/delete/{{ item.id }}" method="post">
+                            <a href="/questions/edit/{{ item.id }}" class="btn btn-info"><i class="fa fa-edit"></i></a>
+                            <button class="btn btn-danger"><i class="fa fa-trash"></i></button><br>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% include 'questions/pagination.html' %}
+    </div>
+</div>
+{% endblock %}

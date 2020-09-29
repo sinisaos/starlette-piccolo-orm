@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<br>
+<div class="container">
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Content</th>
+                    <th>Created</th>
+                    <th>Likes</th>
+                    <th>Accepted answer</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in answers %}
+                <tr>
+                    <td>
+                        <p>{{ item.content[:50] }}...</p>
+                    </td>
+                    <td>{{ item.created_at.strftime('%d-%m-%Y %H:%M:%S') }}</td>
+                    <td>{{ item.answer_like }}</td>
+                    <td>{{ item.is_accepted_answer }}</td>
+                    <td>
+                        <form action="/questions/answer-delete/{{ item.id }}" method="post">
+                            <a href="/questions/answer-edit/{{ item.id }}" class="btn btn-info"><i
+                                    class="fa fa-edit"></i></a>
+                            <button class="btn btn-danger"><i class="fa fa-trash"></i></button><br>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% include 'questions/pagination.html' %}
+    </div>
+</div>
+{% endblock %}
