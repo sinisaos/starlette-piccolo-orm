@@ -1,18 +1,10 @@
 from starlette.routing import Route, Router
 
-from questions.endpoints import (
-    accepted_answer,
-    answer_create,
-    answer_edit,
-    answer_delete,
-    question_detail,
-    questions_categories,
-    questions_list,
-    questions_search,
-    question_create,
-    question_edit,
-    question_delete,
-)
+from questions.endpoints import (accepted_answer, answer_create, answer_delete,
+                                 answer_edit, question_create, question_delete,
+                                 question_detail, question_edit,
+                                 questions_categories, questions_list,
+                                 questions_search)
 
 questions_routes = Router(
     [

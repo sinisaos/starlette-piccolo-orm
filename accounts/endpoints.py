@@ -1,10 +1,10 @@
-from starlette.responses import RedirectResponse
 from starlette.authentication import requires
+from starlette.responses import RedirectResponse
 
 from accounts.forms import LoginForm, RegistrationForm
 from accounts.tables import User, generate_jwt
-from questions.tables import Question, Answer
-from questions.helpers import get_questions, get_answers
+from questions.helpers import get_answers, get_questions
+from questions.tables import Answer, Question
 from settings import BASE_HOST, templates
 from utils import pagination
 

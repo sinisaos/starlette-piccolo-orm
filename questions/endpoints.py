@@ -4,21 +4,11 @@ from starlette.authentication import requires
 from starlette.responses import RedirectResponse
 
 from accounts.tables import User
-from questions.forms import (
-    AcceptedAnswerForm,
-    AnswerForm,
-    AnswerEditForm,
-    AnswerLikesForm,
-    QuestionLikesForm,
-    QuestionEditForm,
-    QuestionForm,
-)
-from questions.helpers import (
-    count_search_questions,
-    get_answers,
-    get_questions,
-    get_search_questions,
-)
+from questions.forms import (AcceptedAnswerForm, AnswerEditForm, AnswerForm,
+                             AnswerLikesForm, QuestionEditForm, QuestionForm,
+                             QuestionLikesForm)
+from questions.helpers import (count_search_questions, get_answers,
+                               get_questions, get_search_questions)
 from questions.tables import Answer, Category, Question
 from settings import BASE_HOST, templates
 from utils import pagination
