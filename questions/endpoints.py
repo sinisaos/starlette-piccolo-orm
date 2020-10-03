@@ -4,11 +4,21 @@ from starlette.authentication import requires
 from starlette.responses import RedirectResponse
 
 from accounts.tables import User
-from questions.forms import (AcceptedAnswerForm, AnswerEditForm, AnswerForm,
-                             AnswerLikesForm, QuestionEditForm, QuestionForm,
-                             QuestionLikesForm)
-from questions.helpers import (count_search_questions, get_answers,
-                               get_questions, get_search_questions)
+from questions.forms import (
+    AcceptedAnswerForm,
+    AnswerEditForm,
+    AnswerForm,
+    AnswerLikesForm,
+    QuestionEditForm,
+    QuestionForm,
+    QuestionLikesForm,
+)
+from questions.helpers import (
+    count_search_questions,
+    get_answers,
+    get_questions,
+    get_search_questions,
+)
 from questions.tables import Answer, Category, Question
 from settings import BASE_HOST, templates
 from utils import pagination
@@ -304,22 +314,28 @@ async def question_detail(request):
     """
     One question with answers
     """
-    id = request.path_params["id"]
+    request_path_id = request.path_params["id"]
     path = request.url.path
     p = Question
-    results = await get_questions().where(p.id == id).first().run()
+    results = (
+        await get_questions().where(p.id == request_path_id).first().run()
+    )
     a = Answer
     answers = (
         await get_answers()
-        .where(a.question.id == id)
+        .where(a.question.id == request_path_id)
         .order_by(a.id, ascending=False)
         .run()
     )
-    answers_count = await a.count().where(a.question.id == id).run()
+    answers_count = (
+        await a.count().where(a.question.id == request_path_id).run()
+    )
     # update question views per session
     session_key = f"viewed_question_{results['id']}"
     if not request.session.get(session_key, False):
-        await p.update({p.view: results["view"] + 1}).run()
+        await p.update({p.view: p.view + 1}).where(
+            p.id == int(request_path_id)
+        ).run()
         request.session[session_key] = True
     qus_data = await request.form()
     question_likes_form = QuestionLikesForm(qus_data)
