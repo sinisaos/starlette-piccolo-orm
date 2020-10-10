@@ -24,11 +24,6 @@ from settings import BASE_HOST, templates
 from utils import pagination
 
 
-def get_categories():
-    category_list = Category.select().run_sync()
-    return category_list
-
-
 async def questions_list(request):
     """
     All questions
@@ -421,37 +416,52 @@ async def question_edit(request):
     p = Question
     c = Category
     request_path_id = request.path_params["id"]
-    question = (
-        await get_questions().where(p.id == request_path_id).first().run()
-    )
-    data = await request.form()
-    form = QuestionEditForm(obj=question, formdata=data)
-    new_form_value, form.description.data = (
-        form.description.data,
-        question["description"],
-    )
-    form.category.choices = [
-        (item["id"], item["name"]) for item in await c.select().run()
-    ]
-    title = form.title.data
-    if request.method == "POST" and form.validate():
-        await p.update(
+    # only question owner can edit question
+    try:
+        question = (
+            await get_questions()
+            .where(
+                (p.id == request_path_id)
+                & (p.user.username == request.user.username)
+            )
+            .first()
+            .run()
+        )
+        data = await request.form()
+        form = QuestionEditForm(obj=question, formdata=data)
+        new_form_value, form.description.data = (
+            form.description.data,
+            question["description"],
+        )
+        form.category.choices = [
+            (item["id"], item["name"]) for item in await c.select().run()
+        ]
+        title = form.title.data
+        if request.method == "POST" and form.validate():
+            await p.update(
+                {
+                    p.title: title,
+                    p.slug: "-".join(title.lower().split()),
+                    p.description: new_form_value,
+                    p.category: form.category.data,
+                }
+            ).where(p.id == request_path_id).run()
+            return RedirectResponse(url="/accounts/profile", status_code=302)
+        return templates.TemplateResponse(
+            "questions/question_edit.html",
             {
-                p.title: title,
-                p.slug: "-".join(title.lower().split()),
-                p.description: new_form_value,
-                p.category: form.category.data,
-            }
-        ).where(p.id == request_path_id).run()
-        return RedirectResponse(url="/accounts/profile", status_code=302)
-    return templates.TemplateResponse(
-        "questions/question_edit.html",
-        {
-            "request": request,
-            "form": form,
-            "question": question,
-        },
-    )
+                "request": request,
+                "form": form,
+                "question": question,
+            },
+        )
+    except TypeError:
+        return templates.TemplateResponse(
+            "403.html",
+            {
+                "request": request,
+            },
+        )
 
 
 @requires("authenticated")
@@ -508,19 +518,39 @@ async def answer_edit(request):
     """
     request_path_id = int(request.path_params["id"])
     a = Answer
-    answer = await get_answers().where(a.id == request_path_id).first().run()
-    data = await request.form()
-    form = AnswerEditForm(data)
-    new_form_value, form.content.data = form.content.data, answer["content"]
-    if request.method == "POST" and form.validate():
-        await a.update({a.content: new_form_value}).where(
-            a.id == request_path_id
-        ).run()
-        return RedirectResponse("/accounts/profile", status_code=302)
-    return templates.TemplateResponse(
-        "questions/answer_edit.html",
-        {"request": request, "form": form, "answer": answer},
-    )
+    # only answer owner can edit answer
+    try:
+        answer = (
+            await get_answers()
+            .where(
+                (a.id == request_path_id)
+                & (a.ans_user.username == request.user.username)
+            )
+            .first()
+            .run()
+        )
+        data = await request.form()
+        form = AnswerEditForm(data)
+        new_form_value, form.content.data = (
+            form.content.data,
+            answer["content"],
+        )
+        if request.method == "POST" and form.validate():
+            await a.update({a.content: new_form_value}).where(
+                a.id == request_path_id
+            ).run()
+            return RedirectResponse("/accounts/profile", status_code=302)
+        return templates.TemplateResponse(
+            "questions/answer_edit.html",
+            {"request": request, "form": form, "answer": answer},
+        )
+    except TypeError:
+        return templates.TemplateResponse(
+            "403.html",
+            {
+                "request": request,
+            },
+        )
 
 
 @requires("authenticated")
