@@ -45,9 +45,7 @@ async def questions_list(request):
                 .run()
             )
         if tab == "unsolved":
-            count = len(
-                await get_questions().where(p.accepted_answer == False).run()
-            )
+            count = await p.count().where(p.accepted_answer == False).run()
             paginator = pagination.Pagination(page_query, count)
             results = (
                 await get_questions()
@@ -58,9 +56,7 @@ async def questions_list(request):
                 .run()
             )
         if tab == "solved":
-            count = len(
-                await get_questions().where(p.accepted_answer == True).run()
-            )
+            count = await p.count().where(p.accepted_answer == True).run()
             paginator = pagination.Pagination(page_query, count)
             results = (
                 await get_questions()
@@ -235,8 +231,13 @@ async def questions_categories(request):
                 .run()
             )
         if tab == "unsolved":
-            count = len(
-                await get_questions().where(p.accepted_answer == False).run()
+            count = (
+                await p.count()
+                .where(
+                    (p.accepted_answer == False)
+                    & (p.category.name == category)
+                )
+                .run()
             )
             paginator = pagination.Pagination(page_query, count)
             results = (
@@ -251,8 +252,12 @@ async def questions_categories(request):
                 .run()
             )
         if tab == "solved":
-            count = len(
-                await get_questions().where(p.accepted_answer == True).run()
+            count = (
+                await p.count()
+                .where(
+                    (p.accepted_answer == True) & (p.category.name == category)
+                )
+                .run()
             )
             paginator = pagination.Pagination(page_query, count)
             results = (

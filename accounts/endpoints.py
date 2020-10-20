@@ -153,6 +153,7 @@ async def profile_questions(request):
             .where(p.user.username == auth_user)
             .limit(paginator.page_size)
             .offset(paginator.offset())
+            .order_by(p.id, ascending=False)
             .run()
         )
         page_controls = pagination.get_page_controls(
@@ -183,6 +184,7 @@ async def profile_answers(request):
             .where(a.ans_user.username == auth_user)
             .limit(paginator.page_size)
             .offset(paginator.offset())
+            .order_by(a.id, ascending=False)
             .run()
         )
         page_controls = pagination.get_page_controls(
