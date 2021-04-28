@@ -409,7 +409,11 @@ async def question_create(request):
         await query.save().run()
         return RedirectResponse(url="/questions", status_code=302)
     return templates.TemplateResponse(
-        "questions/question_create.html", {"request": request, "form": form}
+        "questions/question_create.html",
+        {
+            "request": request,
+            "form": form,
+        },
     )
 
 
@@ -502,7 +506,7 @@ async def answer_create(request):
             content=form.content.data,
             created_at=datetime.datetime.now(),
             answer_like=0,
-            is_accepted_answer=0,
+            is_accepted_answer=False,
             question=request_path_id,
             ans_user=session_user["id"],
         )
@@ -512,7 +516,11 @@ async def answer_create(request):
         )
     return templates.TemplateResponse(
         "questions/answer_create.html",
-        {"request": request, "form": form, "next": request_query_next},
+        {
+            "request": request,
+            "form": form,
+            "next": request_query_next,
+        },
     )
 
 
