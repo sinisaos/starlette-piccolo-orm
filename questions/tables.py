@@ -1,5 +1,11 @@
-from piccolo.columns import (Boolean, ForeignKey, Integer, Text, Timestamp,
-                             Varchar)
+from piccolo.columns import (
+    Boolean,
+    ForeignKey,
+    Integer,
+    Text,
+    Timestamp,
+    Varchar,
+)
 from piccolo.columns.readable import Readable
 from piccolo.table import Table
 
@@ -31,7 +37,7 @@ class Question(Table):
     view = Integer(default=0)
     question_like = Integer(default=0)
     accepted_answer = Boolean(default=False)
-    user = ForeignKey(references=User)
+    question_user = ForeignKey(references=User)
     category = ForeignKey(references=Category)
 
     @classmethod

@@ -37,13 +37,15 @@
                 <div class="card">
                     <div class="card-body">
                         <h4 class="card-title"><b><a
-                                    href="{{ url_for('question_detail', id=item[0].id, slug=item[0].slug) }}">{{ item[0].title }}</a></b>
+                                    href="{{ url_for('question_detail', id=item[0].id, slug=item[0].slug) }}">{{
+                                    item[0].title }}</a></b>
                             <a class="btn btn-outline-dark float-right"
-                                href="{{ url_for('questions_categories', category=item[0]['category.slug']) }}">{{ item[0]["category.name"] }}</a>
+                                href="{{ url_for('questions_categories', category=item[0]['category.slug']) }}">{{
+                                item[0]["category.name"] }}</a>
                         </h4>
                         <span>asked on <i>{{ item[0].created_at.strftime('%d-%m-%Y %H:%M:%S') }}</i>
                             by
-                            <b>{{ item[0]["user.username"] }}</b>
+                            <b>{{ item[0]["question_user.username"] }}</b>
                         </span>
                         <hr>
                         <p class="card-title">{{ item[0].description }}</p><br>

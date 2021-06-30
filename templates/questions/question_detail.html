@@ -10,10 +10,11 @@
                     <div class="card-body">
                         <h4><b>{{ item["title"] }}</b>
                             <a class="btn btn-outline-dark float-right"
-                                href="{{ url_for('questions_categories', category=item['category.slug']) }}">{{ item["category.name"] }}</a>
+                                href="{{ url_for('questions_categories', category=item['category.slug']) }}">{{
+                                item["category.name"] }}</a>
                         </h4>
                         <span>asked on <i>{{ item["created_at"].strftime('%d-%m-%Y %H:%M:%S') }}</i> by
-                            <b>{{ item["user.username"] }}</b><b>
+                            <b>{{ item["question_user.username"] }}</b><b>
                             </b>
                         </span>
                         <hr>
@@ -74,7 +75,8 @@
                                 class="fa fa-thumbs-up" aria-hidden="true" title="Like">
                                 {{ result.answer_like }}&ensp;</i></a>
                         {% endif %}
-                        {% if item["user.username"] == request.user.username and result.is_accepted_answer == False and item["accepted_answer"] == False  %}
+                        {% if item["user.username"] == request.user.username and result.is_accepted_answer == False and
+                        item["accepted_answer"] == False %}
                         <a href="{{ url_for('accepted_answer') }}?next={{ path }}/{{ result.id }}"
                             class="btn btn-outline-info float-left">Accept
                             Answer</a>

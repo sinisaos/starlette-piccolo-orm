@@ -431,7 +431,7 @@ async def question_edit(request):
             await get_questions()
             .where(
                 (p.id == request_path_id)
-                & (p.user.username == request.user.username)
+                & (p.question_user.username == request.user.username)
             )
             .first()
             .run()

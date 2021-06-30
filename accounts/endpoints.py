@@ -123,7 +123,7 @@ async def profile(request):
         auth_user = request.user.display_name
         results = await u.select().where(u.username == auth_user).run()
         questions_count = (
-            await p.count().where(p.user.username == auth_user).run()
+            await p.count().where(p.question_user.username == auth_user).run()
         )
         answers_count = (
             await a.count().where(a.ans_user.username == auth_user).run()
@@ -145,12 +145,12 @@ async def profile_questions(request):
     p = Question
     auth_user = request.user.display_name
     page_query = pagination.get_page_number(url=request.url)
-    count = await p.count().where(p.user.username == auth_user).run()
+    count = await p.count().where(p.question_user.username == auth_user).run()
     paginator = pagination.Pagination(page_query, count)
     if request.user.is_authenticated:
         questions = (
             await get_questions()
-            .where(p.user.username == auth_user)
+            .where(p.question_user.username == auth_user)
             .limit(paginator.page_size)
             .offset(paginator.offset())
             .order_by(p.id, ascending=False)

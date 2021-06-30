@@ -12,7 +12,7 @@ def get_questions():
         p.view,
         p.question_like,
         p.accepted_answer,
-        p.user.username,
+        p.question_user.username,
         p.category.name,
         p.category.slug,
     )
@@ -44,14 +44,14 @@ def get_search_questions(q):
         p.view,
         p.question_like,
         p.accepted_answer,
-        p.user.username,
+        p.question_user.username,
         p.category.name,
         p.category.slug,
     ).where(
         (
             (p.title.ilike("%" + q + "%"))
             | (p.description.ilike("%" + q + "%"))
-            | (p.user.username.ilike("%" + q + "%"))
+            | (p.question_user.username.ilike("%" + q + "%"))
             | (p.category.name.ilike("%" + q + "%"))
         )
     )
@@ -64,7 +64,7 @@ def count_search_questions(q):
         (
             (p.title.ilike("%" + q + "%"))
             | (p.description.ilike("%" + q + "%"))
-            | (p.user.username.ilike("%" + q + "%"))
+            | (p.question_user.username.ilike("%" + q + "%"))
             | (p.category.name.ilike("%" + q + "%"))
         )
     )
