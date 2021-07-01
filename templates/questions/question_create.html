@@ -13,7 +13,7 @@
         <h1 class="mt-5">Create question</h1>
         <br />
         <form id="questionForm" class="form form-question" method="POST" action="" role="form">
-            {{ form.csrf_token }}
+            <input type="hidden" name="csrftoken" value="{{ request.scope.csrftoken() }}">
             <div class="form-group">
                 {{form.category(class_="form-control")}}
                 {% for error in form.category.errors %}

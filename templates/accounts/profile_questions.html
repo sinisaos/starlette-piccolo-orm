@@ -27,6 +27,7 @@
                     <td>{{ item.question_like }}</td>
                     <td>
                         <form action="/questions/delete/{{ item.id }}" method="post">
+                            <input type="hidden" name="csrftoken" value="{{ request.scope.csrftoken() }}">
                             <a href="/questions/edit/{{ item.id }}" class="btn btn-info"><i class="fa fa-edit"></i></a>
                             <button class="btn btn-danger"><i class="fa fa-trash"></i></button><br>
                         </form>

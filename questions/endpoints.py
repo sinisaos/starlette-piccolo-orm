@@ -404,7 +404,7 @@ async def question_create(request):
             description=form.description.data,
             created_at=datetime.datetime.now(),
             category=form.category.data,
-            user=session_user["id"],
+            question_user=session_user["id"],
         )
         await query.save().run()
         return RedirectResponse(url="/questions", status_code=302)

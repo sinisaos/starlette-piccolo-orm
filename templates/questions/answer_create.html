@@ -5,7 +5,7 @@
         <h1 class="mt-5">Create answer</h1>
         <br />
         <form id="answerForm" class="form form-answer" method="POST" action="" role="form">
-            {{ form.csrf_token }}
+            <input type="hidden" name="csrftoken" value="{{ request.scope.csrftoken() }}">
             <div class="form-group">
                 {{form.content(placeholder="Content", cols="35", rows="10",class_="form-control") |safe}}
                 {% for error in form.content.errors %}

@@ -5,7 +5,7 @@
         <h1 class="mt-5">Edit question</h1>
         <br />
         <form id="questionEditForm" class="form form-question-edit" method="POST" action="" role="form">
-            {{ form.csrf_token }}
+            <input type="hidden" name="csrftoken" value="{{ request.scope.csrftoken() }}">
             <div class="form-group">
                 {{form.category(value=question.category, class_="form-control")}}
                 {% for error in form.category.errors %}

@@ -25,6 +25,7 @@
                     <td>{{ item.is_accepted_answer }}</td>
                     <td>
                         <form action="/questions/answer-delete/{{ item.id }}" method="post">
+                            <input type="hidden" name="csrftoken" value="{{ request.scope.csrftoken() }}">
                             <a href="/questions/answer-edit/{{ item.id }}" class="btn btn-info"><i
                                     class="fa fa-edit"></i></a>
                             <button class="btn btn-danger"><i class="fa fa-trash"></i></button><br>

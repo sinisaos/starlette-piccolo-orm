@@ -29,6 +29,7 @@
                         {% if request.user.is_authenticated %}
                         <form id="questionlikesForm" class="form form-questionlikes" method="POST" action=""
                             role="form">
+                            <input type="hidden" name="csrftoken" value="{{ request.scope.csrftoken() }}">
                             {{ question_likes_form.question_id(value=item["id"]) }}
                             <p class="float-right"><input class="btn btn-link fa" style="color:#33cc33;" type="submit"
                                     value="&#xf164; {{ item.question_like }}">
@@ -65,6 +66,7 @@
                         <p>{{ result.content }}</p>
                         {% if request.user.is_authenticated %}
                         <form id="likesForm" class="form form-likes" method="POST" action="" role="form">
+                            <input type="hidden" name="csrftoken" value="{{ request.scope.csrftoken() }}">
                             {{ likes_form.answer_id(value=result.id) }}
                             <p class="float-right"><input class="btn btn-link fa" style="color:#33cc33;" type="submit"
                                     value="&#xf164; {{ result.answer_like }}">&nbsp;
@@ -75,13 +77,15 @@
                                 class="fa fa-thumbs-up" aria-hidden="true" title="Like">
                                 {{ result.answer_like }}&ensp;</i></a>
                         {% endif %}
-                        {% if item["user.username"] == request.user.username and result.is_accepted_answer == False and
+                        {% if item["question_user.username"] == request.user.username and result.is_accepted_answer ==
+                        False and
                         item["accepted_answer"] == False %}
                         <a href="{{ url_for('accepted_answer') }}?next={{ path }}/{{ result.id }}"
                             class="btn btn-outline-info float-left">Accept
                             Answer</a>
                         <br>
-                        {% elif item["user.username"] == request.user.username and result.is_accepted_answer == True %}
+                        {% elif item["question_user.username"] == request.user.username and result.is_accepted_answer ==
+                        True %}
                         <span class="badge badge-badge-pill badge-success float-left">Accepted answer</span>
                         {% elif result.is_accepted_answer == True %}
                         <span class="badge badge-badge-pill badge-success float-left">Accepted answer</span>

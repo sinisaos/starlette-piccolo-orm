@@ -1,3 +1,4 @@
+from asgi_csrf import asgi_csrf
 from piccolo.engine import engine_finder
 from piccolo_admin.endpoints import create_admin
 from secure import SecureHeaders
@@ -76,3 +77,7 @@ async def open_database_connection_pool():
 async def close_database_connection_pool():
     engine = engine_finder()
     await engine.close_connnection_pool()
+
+
+# middleware for protecting against CSRF attacks
+app = asgi_csrf(app, signing_secret=SECRET_KEY, always_set_cookie=True)

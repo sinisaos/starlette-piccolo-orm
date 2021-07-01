@@ -4,6 +4,7 @@
     <div class="container">
         <br>
         <form id="acceptForm" class="form form-accept" method="POST" action="" role="form">
+            <input type="hidden" name="csrftoken" value="{{ request.scope.csrftoken() }}">
             {{ form.answer_id(value=answer_id) }}
             <p class="float-left"><input class="btn btn-outline-info" type="submit" value="Accept Answer">
             </p>

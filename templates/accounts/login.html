@@ -15,7 +15,7 @@
                 <h2 class="text-center">Sign In</h2>
                 <br />
                 <form id="loginForm" class="form form-login" method="POST" action="" role="form">
-                    {{ form.csrf_token }}
+                    <input type="hidden" name="csrftoken" value="{{ request.scope.csrftoken() }}">
                     <div class="form-group">
                         <label for="">Username*</label>
                         {{form.username(placeholder="Enter username", class_="form-control")}}

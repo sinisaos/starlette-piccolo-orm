@@ -10,8 +10,8 @@
                     <li class="list-group-item text-muted">Profile <i class="fas fa-user"></i></li>
                     {% for user in results %}
                     <li class="list-group-item text-right"><span
-                            class="float-left"><strong>Username</strong></span><span
-                            class="float-right">{{ user.username }}</span>
+                            class="float-left"><strong>Username</strong></span><span class="float-right">{{
+                            user.username }}</span>
                     </li>
                     <li class="list-group-item text-right"><span class="float-left"><strong>Email</strong></span><span
                             class="float-right">{{ user.email }}</span>
@@ -26,6 +26,7 @@
                     </li>
                     <li class="list-group-item text-right"><span class="float-right">
                             <form action="/accounts/user-delete/{{ user.id }}" method="post">
+                                <input type="hidden" name="csrftoken" value="{{ request.scope.csrftoken() }}">
                                 <button class="btn btn-danger float-right"
                                     onclick="return confirm('Are you sure you want to delete your account? Deleting your account cannot be undone !!!');">
                                     <i lass="fa fa-trash">
