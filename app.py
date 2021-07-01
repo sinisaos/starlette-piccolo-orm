@@ -1,4 +1,6 @@
+from asgi_caches.middleware import CacheMiddleware
 from asgi_csrf import asgi_csrf
+from caches import Cache
 from piccolo.engine import engine_finder
 from piccolo_admin.endpoints import create_admin
 from secure import SecureHeaders
@@ -15,6 +17,9 @@ from questions.routes import questions_routes
 from questions.tables import Answer, Category, Question
 from settings import SECRET_KEY, templates
 
+# cache
+cache = Cache("locmem://null", ttl=5)
+
 # Security Headers are HTTP response headers that, when set,
 # can enhance the security of your web application
 # by enabling browser security policies.
@@ -25,7 +30,12 @@ routes = [
     Route("/", HomeEndpoint, name="index"),
 ]
 
-app = Starlette(debug=True, routes=routes)
+app = Starlette(
+    debug=True,
+    routes=routes,
+    on_startup=[cache.connect],
+    on_shutdown=[cache.disconnect],
+)
 
 app.mount(
     "/admin/",
@@ -35,6 +45,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/accounts", accounts_routes)
 app.mount("/questions", questions_routes)
 
+app.add_middleware(CacheMiddleware, cache=cache)
 app.add_middleware(AuthenticationMiddleware, backend=UserAuthentication())
 app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
 

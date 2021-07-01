@@ -1,7 +1,11 @@
 aiofiles==0.5.0
+aioredis==1.3.1 
 aiosqlite==0.15.0
 appdirs==1.4.4
 asgi-csrf==0.9
+asgi-caches==0.3.1 
+async-caches==0.3.0 
+async-timeout==3.0.1 
 asgiref==3.2.10
 asyncpg==0.21.0
 attrs==20.2.0
@@ -18,6 +22,7 @@ fastapi==0.61.1
 gunicorn==20.0.4
 h11==0.9.0
 h2==3.2.0
+hiredis==2.0.0
 hpack==3.0.0
 httptools==0.1.1
 Hypercorn==0.10.2
